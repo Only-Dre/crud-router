@@ -1,7 +1,10 @@
+// Barra de Navegação
+
 import React from "react";
 import {Link} from "react-router-dom";
-// import "./NavBar.css";
+import "./NavBar.css";
 
+// Acesso à função Logout
 function NavBar({onLogout}){
     return(
         <nav className="navbar">
@@ -15,4 +18,5 @@ function NavBar({onLogout}){
         </nav>
     );
 
-}export default NavBar;
+}
+export default NavBar;
