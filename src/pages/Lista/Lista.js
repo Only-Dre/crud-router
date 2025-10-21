@@ -8,10 +8,30 @@ function Lista({ contacts, setContacts }) {
   const [newPhone, setNewPhone] = useState("");
 
   const [handleSave] = (id) => {
+    // Salvando no id
+    // Varre todos os elementos do contacts
     setContacts(
+        // Faz uma "lista/array", atualizando assim a lista de contatos
+        contacts.map((c) => (
+            c.id === id ? {...c, name : newName, phone : newPhone} : c
+        ))
+    );
+    setEditingId(null);
 
-    )
   };
+
+  const handleEdit = (contact) => {
+    // Mudando as variáveis de estado
+    // ID, Nome, Telefone
+    // Ao modificar o ID, o return percebe e ordena atualização do mapeamento da Lista, permitindo processos de alteração
+    setEditingId(contact.id);
+    setNewName(contact.name);
+    setNewPhone(contact.phone);
+  }
+
+  const handleDelete = (id) => {
+    setContacts(contacts.filter((c) => c.id !== id))
+  }
 
   return (
     <div className="lista-container">
@@ -50,7 +70,7 @@ function Lista({ contacts, setContacts }) {
                     {contact.name} - {contact.phone}
                   </span>
                   <button onClick={() => handleEdit(contact)}>Editar Contato</button>
-                  <button onClick={() => handleDelet(contact)}>Excluir Contato</button>
+                  <button onClick={() => handleDelete(contact)}>Excluir Contato</button>
                 </>
               )}
             </li>

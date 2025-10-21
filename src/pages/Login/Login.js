@@ -1,5 +1,4 @@
 // Página de Login
-
 import React, {useState} from 'react';
 import "./Login.css";
 
@@ -8,13 +7,13 @@ function Login({onLogin}){
     const [password, setPassword] = useState('');
 
     const handleSubmit = (e) => {
-        preventDefault();
+        e.preventDefault();
         onLogin(username, password);
     }
 
     return(
-        <div>
-            <form onSubmit={handleSubmit}>
+        <div className='login-container'>
+            <form onSubmit={handleSubmit} className='login-form'>
                 <h2>Agenda de Contatos</h2>
                 <p>Faça login para continuar</p>
                 <input 

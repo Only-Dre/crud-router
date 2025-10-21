@@ -1,11 +1,22 @@
 import React, {useState} from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import "./App.css";
+
+
+// Importando Home
+import Home from "./pages/Home/Home";
 
 // Importando Páginas
 import Login from "./pages/Login/Login";
 
 // Importando NavBar - Main Menu
 import NavBar from './components/NavBar/NavBar';
+
+// Importando Lista
+import Lista from './pages/Lista/Lista';
+
+// Importando Cadastro
+import Cadastro from './pages/Cadastro/Cadastro';
 
 function App(){
   // Estado Global simplificado de login e Contatos
