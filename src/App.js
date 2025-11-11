@@ -1,7 +1,6 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import "./App.css";
-
 
 // Importando Home
 import Home from "./pages/Home/Home";
@@ -18,79 +17,144 @@ import Lista from './pages/Lista/Lista';
 // Importando Cadastro
 import Cadastro from './pages/Cadastro/Cadastro';
 
-function App(){
+function App() {
   // Estado Global simplificado de login e Contatos
-  // Autenticação começa por 'false', por padrão
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [contacts, setContacts] = useState([]);
 
-  // Função de Login
-  // "chamaLogin" pelo user e senha
-  // Verifica se o username E a password sejam as mesmas do código
-  // admin - 123
+  // FUNÇÕES FETCH API
+
+  const API_URL = "http://localhost:3000/contacts"; // Endpoint local JSON Server
+
+  // GET - Buscar todos os contatos
+  const fetchContacts = async () => {
+    try {
+      const response = await fetch(API_URL);
+      if (!response.ok) throw new Error("Erro ao buscar contatos");
+      const data = await response.json();
+      setContacts(data);
+    } catch (error) {
+      console.error("Erro (GET):", error);
+    }
+  };
+
+  // POST - Adicionar novo contato
+  const addContact = async (newContact) => {
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newContact),
+      });
+      if (!response.ok) throw new Error("Erro ao adicionar contato");
+      const data = await response.json();
+      setContacts((prev) => [...prev, data]);
+    } catch (error) {
+      console.error("Erro (POST):", error);
+    }
+  };
+
+  // PUT - Atualizar contato existente
+  const updateContact = async (id, updatedContact) => {
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedContact),
+      });
+      if (!response.ok) throw new Error("Erro ao atualizar contato");
+      const data = await response.json();
+      setContacts((prev) =>
+        prev.map((contact) => (contact.id === id ? data : contact))
+      );
+    } catch (error) {
+      console.error("Erro (PUT):", error);
+    }
+  };
+
+  // DELETE - Remover contato
+  const deleteContact = async (id) => {
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("Erro ao deletar contato");
+      setContacts((prev) => prev.filter((contact) => contact.id !== id));
+    } catch (error) {
+      console.error("Erro (DELETE):", error);
+    }
+  };
+
+  // LOGIN / LOGOUT
   const handleLogin = (username, password) => {
-    if (username === "admin" && password === "123"){
-      // Caso sejam iguais, transforma em true e prossegue o login
-      setIsAuthenticated(true)
-    }else{
-      // Caso contrário, nega o código
+    if (username === "admin" && password === "123") {
+      setIsAuthenticated(true);
+      fetchContacts(); // Carrega contatos ao logar
+    } else {
       alert("Usuário ou senha inválidos!");
     }
   };
 
-  // Função de Logout
   const handleLogout = () => {
     setIsAuthenticated(false);
   };
-  return(
-    // Criando as Rotas de páginas
+
+  // ROTAS
+  return (
     <Router>
-      {/* Caso esteja logado, executa o Logout, caso NÃO ESTEJA, não executa o Logout */}
-      {isAuthenticated && <NavBar onLogout={handleLogout}/>}
+      {isAuthenticated && <NavBar onLogout={handleLogout} />}
       <Routes>
-        {/* Especificação de Links/Rotas de acesso da NavBar */}
-        
-        <Route // Rota de Login
-        path='/Login'
-        element = {
-          isAuthenticated ? <Navigate to="/"/> : <Login onLogin={handleLogin}/>}
+        <Route
+          path="/Login"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/" />
+            ) : (
+              <Login onLogin={handleLogin} />
+            )
+          }
         />
 
         <Route
-        path='/'
-        element = {
-          isAuthenticated ? <Home/> : <Navigate to="/Login"/>
-        }
-        />
-
-        <Route // Tela de Cadastro
-        path='/cadastro'
-        element = { // Caso esteja autenticado, confirma o contacts
-          isAuthenticated ?
-            <Cadastro contacts={contacts} setContacts={setContacts}/>
-            : // CASO NÃO ESTEJA, retorna à tela de Login
-            (<Navigate to="/Login"/>)
-        }        
-        />
-
-        <Route // Lista de Contatos
-        path='/lista'
-        element = {
-          isAuthenticated ?
-          // Situações
-            (<Lista contacts={contacts} setContacts={setContacts}/>)
-            :
-            (<Navigate to="/Login"/>)
-        }
+          path="/"
+          element={isAuthenticated ? <Home /> : <Navigate to="/Login" />}
         />
 
         <Route
-        path='*' // Caso o caminho seja igual à qualquer outra coisa
-        element = {<Navigate to="/Login"/>}
+          path="/cadastro"
+          element={
+            isAuthenticated ? (
+              <Cadastro
+                contacts={contacts}
+                setContacts={setContacts}
+                addContact={addContact}
+              />
+            ) : (
+              <Navigate to="/Login" />
+            )
+          }
         />
 
+        <Route
+          path="/lista"
+          element={
+            isAuthenticated ? (
+              <Lista
+                contacts={contacts}
+                setContacts={setContacts}
+                deleteContact={deleteContact}
+                updateContact={updateContact}
+              />
+            ) : (
+              <Navigate to="/Login" />
+            )
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/Login" />} />
       </Routes>
     </Router>
-  )
-};
+  );
+}
+
 export default App;
